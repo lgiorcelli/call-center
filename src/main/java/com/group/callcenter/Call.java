@@ -1,5 +1,6 @@
 package com.group.callcenter;
 
-class Call {
+public interface Call {
 
+	void link();
 }

@@ -1,4 +1,4 @@
-package com.group.callcenter;
+package com.group.callcenter.unit;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -11,20 +11,25 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
+import com.group.callcenter.Call;
+import com.group.callcenter.CallAnswerer;
+import com.group.callcenter.RolePriorityDispatcher;
 
 public class DispatcherTest {
-	private Pool supervisorPool;
-	private Pool operatorPool;
-	private Pool managerPool;
+	private CallAnswerer supervisors;
+	private CallAnswerer operators;
+	private CallAnswerer managers;
 
-	private Call ANY_CALL = new Call();
+	private Call ANY_CALL = () -> {
+	};
+
 	private RolePriorityDispatcher dispatcher;
 
 	@Before
 	public void setUp() {
-		operatorPool = mock(Pool.class);
-		supervisorPool = mock(Pool.class);
-		managerPool = mock(Pool.class);
+		operators = mock(CallAnswerer.class);
+		supervisors = mock(CallAnswerer.class);
+		managers = mock(CallAnswerer.class);
 	}
 
 	@Test
@@ -64,31 +69,31 @@ public class DispatcherTest {
 	}
 
 	private void givenAnAvailableGroupOfManagers() {
-		setGroupAvailability(managerPool, true);
+		setGroupAvailability(managers, true);
 	}
 
 	private void givenAnUnavailableGroupOfSupervisors() {
-		setGroupAvailability(supervisorPool, false);
+		setGroupAvailability(supervisors, false);
 	}
 
 	private void givenAnAvailableGroupOfOperators() {
-		setGroupAvailability(operatorPool, true);
+		setGroupAvailability(operators, true);
 	}
 
 	private void givenAnAvailableGroupOfSupervisors() {
-		setGroupAvailability(supervisorPool, true);
+		setGroupAvailability(supervisors, true);
 	}
 
 	private void givenAnUnavailableGroupOfOperators() {
-		setGroupAvailability(operatorPool, false);
+		setGroupAvailability(operators, false);
 	}
 
-	private void setGroupAvailability(Pool managerPool, boolean availability) {
-		when(managerPool.canAttendCall()).thenReturn(availability);
+	private void setGroupAvailability(CallAnswerer managerPool, boolean availability) {
+		when(managerPool.canAnswerCall()).thenReturn(availability);
 	}
 
 	private void givenADispatcherWithRolePriority() {
-		List<Pool> priorityQueue = Lists.newArrayList(operatorPool, supervisorPool, managerPool);
+		List<CallAnswerer> priorityQueue = Lists.newArrayList(operators, supervisors, managers);
 		dispatcher = new RolePriorityDispatcher(priorityQueue);
 	}
 
@@ -105,9 +110,9 @@ public class DispatcherTest {
 	}
 
 	private void verifyCallsAttended(int operatorAttendedCalls, int supervisorAttendedCalls, int managerAttendedCalls) {
-		verify(operatorPool, times(operatorAttendedCalls)).assignCall(ANY_CALL);
-		verify(supervisorPool, times(supervisorAttendedCalls)).assignCall(ANY_CALL);
-		verify(managerPool, times(managerAttendedCalls)).assignCall(ANY_CALL);
+		verify(operators, times(operatorAttendedCalls)).answerCall(ANY_CALL);
+		verify(supervisors, times(supervisorAttendedCalls)).answerCall(ANY_CALL);
+		verify(managers, times(managerAttendedCalls)).answerCall(ANY_CALL);
 	}
 
 }

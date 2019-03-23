@@ -4,18 +4,18 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-class RolePriorityChain {
-	private List<Pool> priorityQueue = Lists.newArrayList();
+public class RolePriorityChain {
+	private List<CallAnswerer> priorityQueue = Lists.newArrayList();
 
-	public RolePriorityChain(List<Pool> priorityQueue) {
+	public RolePriorityChain(List<CallAnswerer> priorityQueue) {
 		this.priorityQueue.addAll(priorityQueue);
 	}
 
 	public void dispatchCall(Call call) {
 		int priority = 0;
-		while (!priorityQueue.get(priority).canAttendCall()) {
+		while (!priorityQueue.get(priority).canAnswerCall()) {
 			priority++;
 		}
-		priorityQueue.get(priority).assignCall(call);
+		priorityQueue.get(priority).answerCall(call);
 	}
 }

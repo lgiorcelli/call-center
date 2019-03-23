@@ -2,10 +2,10 @@ package com.group.callcenter;
 
 import java.util.List;
 
-class RolePriorityDispatcher implements Dispatcher {
+public class RolePriorityDispatcher implements Dispatcher {
 	private RolePriorityChain rolePriorityChain;
 
-	public RolePriorityDispatcher(List<Pool> priorityQueue) {
+	public RolePriorityDispatcher(List<CallAnswerer> priorityQueue) {
 		rolePriorityChain = new RolePriorityChain(priorityQueue);
 	}
 

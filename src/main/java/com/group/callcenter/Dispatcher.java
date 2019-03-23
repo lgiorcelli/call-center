@@ -1,5 +1,5 @@
 package com.group.callcenter;
 
-interface Dispatcher {
+public interface Dispatcher {
 	void dispatchCall(Call call);
 }
