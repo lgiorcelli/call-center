@@ -50,6 +50,27 @@ public class DispatcherTest {
 		thenSupervisorsAttendsTheCall();
 	}
 
+	@Test
+	public void assign_a_call_to_a_manager_when_there_are_not_available_operators_nor_managers() {
+		givenAnUnavailableGroupOfOperators();
+		givenAnUnavailableGroupOfSupervisors();
+		givenAnAvailableGroupOfManagers();
+
+		givenADispatcherWithRolePriority();
+		//WHEN
+		whenACallIsDispatched();
+		//THEN
+		verifyCallsAttended(0,0,1);
+	}
+
+	private void givenAnAvailableGroupOfManagers() {
+		when(managerPool.canAttendCall()).thenReturn(true);
+	}
+
+	private void givenAnUnavailableGroupOfSupervisors() {
+		when(supervisorPool.canAttendCall()).thenReturn(false);
+	}
+
 	private void givenAnAvailableGroupOfOperators() {
 		when(operatorPool.canAttendCall()).thenReturn(true);
 	}
@@ -72,17 +93,17 @@ public class DispatcherTest {
 	}
 
 	private void thenOperatorsAttendsTheCall() {
-		verifyCallsAttended(1, 0);
+		verifyCallsAttended(1, 0, 0);
 	}
 
 	private void thenSupervisorsAttendsTheCall() {
-		verifyCallsAttended(0, 1);
+		verifyCallsAttended(0, 1, 0);
 	}
 
-	private void verifyCallsAttended(int operatorAttendedCalls, int supervisorAttendedCalls) {
+	private void verifyCallsAttended(int operatorAttendedCalls, int supervisorAttendedCalls, int managerAttendedCalls) {
 		verify(operatorPool, times(operatorAttendedCalls)).assignCall(ANY_CALL);
 		verify(supervisorPool, times(supervisorAttendedCalls)).assignCall(ANY_CALL);
-		verify(managerPool, times(0)).assignCall(ANY_CALL);
+		verify(managerPool, times(managerAttendedCalls)).assignCall(ANY_CALL);
 	}
 
 }
