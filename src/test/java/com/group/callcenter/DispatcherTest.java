@@ -64,23 +64,27 @@ public class DispatcherTest {
 	}
 
 	private void givenAnAvailableGroupOfManagers() {
-		when(managerPool.canAttendCall()).thenReturn(true);
+		setGroupAvailability(managerPool, true);
 	}
 
 	private void givenAnUnavailableGroupOfSupervisors() {
-		when(supervisorPool.canAttendCall()).thenReturn(false);
+		setGroupAvailability(supervisorPool, false);
 	}
 
 	private void givenAnAvailableGroupOfOperators() {
-		when(operatorPool.canAttendCall()).thenReturn(true);
+		setGroupAvailability(operatorPool, true);
 	}
 
 	private void givenAnAvailableGroupOfSupervisors() {
-		when(supervisorPool.canAttendCall()).thenReturn(true);
+		setGroupAvailability(supervisorPool, true);
 	}
 
 	private void givenAnUnavailableGroupOfOperators() {
-		when(operatorPool.canAttendCall()).thenReturn(false);
+		setGroupAvailability(operatorPool, false);
+	}
+
+	private void setGroupAvailability(Pool managerPool, boolean availability) {
+		when(managerPool.canAttendCall()).thenReturn(availability);
 	}
 
 	private void givenADispatcherWithRolePriority() {
@@ -108,44 +112,3 @@ public class DispatcherTest {
 
 }
 
-class RolePriorityDispatcher implements Dispatcher {
-	private RolePriorityChain rolePriorityChain;
-
-	public RolePriorityDispatcher(List<Pool> priorityQueue) {
-		rolePriorityChain = new RolePriorityChain(priorityQueue);
-	}
-
-	public void dispatchCall(Call call) {
-		rolePriorityChain.dispatchCall(call);
-	}
-}
-
-class RolePriorityChain {
-	private List<Pool> priorityQueue = Lists.newArrayList();
-
-	public RolePriorityChain(List<Pool> priorityQueue) {
-		this.priorityQueue.addAll(priorityQueue);
-	}
-
-	public void dispatchCall(Call call) {
-		int priority = 0;
-		while (!priorityQueue.get(priority).canAttendCall()) {
-			priority++;
-		}
-		priorityQueue.get(priority).assignCall(call);
-	}
-}
-
-interface Dispatcher {
-	void dispatchCall(Call call);
-}
-
-interface Pool {
-	boolean canAttendCall();
-
-	boolean assignCall(Call call);
-}
-
-class Call {
-
-}
