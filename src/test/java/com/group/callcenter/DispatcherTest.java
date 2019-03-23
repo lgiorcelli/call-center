@@ -1,8 +1,10 @@
 package com.group.callcenter;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -16,25 +18,40 @@ public class DispatcherTest {
 	private Pool operatorPool;
 	private Pool managerPool;
 
-	private Call aCall;
+	private Call ANY_CALL = new Call();
 	private RolePriorityDispatcher dispatcher;
 
 	@Before
 	public void setUp() {
 		operatorPool = mock(Pool.class);
+
 		supervisorPool = mock(Pool.class);
 		managerPool = mock(Pool.class);
-		givenACall();
 	}
 
 	@Test
 	public void assign_a_call_to_a_operator_as_a_first_option() {
 		//GIVEN
+		when(operatorPool.assignCall(ANY_CALL)).thenReturn(true);
 		givenADispatcherWithRolePriority();
 		//WHEN
-		dispatcher.dispatchCall(aCall);
+		dispatcher.dispatchCall(ANY_CALL);
 		//THEN
 		thenOnlyOperatorsAttendsTheCall();
+	}
+
+	@Test
+	public void assign_a_call_to_a_operator_when_there_are_not_available_operators() {
+		//GIVEN
+		when(operatorPool.assignCall(ANY_CALL)).thenReturn(false);
+		when(supervisorPool.assignCall(ANY_CALL)).thenReturn(true);
+		givenADispatcherWithRolePriority();
+		//WHEN
+		dispatcher.dispatchCall(ANY_CALL);
+		//THEN
+		verify(operatorPool).assignCall(ANY_CALL);
+		verify(supervisorPool).assignCall(ANY_CALL);
+		verifyZeroInteractions(managerPool);
 	}
 
 	private void givenADispatcherWithRolePriority() {
@@ -43,13 +60,10 @@ public class DispatcherTest {
 	}
 
 	private void thenOnlyOperatorsAttendsTheCall() {
-		verify(operatorPool).assignCall(aCall);
+		verify(operatorPool).assignCall(ANY_CALL);
 		verifyZeroInteractions(supervisorPool, managerPool);
 	}
 
-	private void givenACall() {
-		aCall = new Call();
-	}
 }
 
 class RolePriorityDispatcher implements Dispatcher {
@@ -60,7 +74,10 @@ class RolePriorityDispatcher implements Dispatcher {
 	}
 
 	public void dispatchCall(Call call) {
-		priorityQueue.get(0).assignCall(call);
+		int priority = 0;
+		while (!priorityQueue.get(priority).assignCall(call)) {
+			priority++;
+		}
 	}
 }
 
@@ -70,7 +87,7 @@ interface Dispatcher {
 
 interface Pool {
 
-	void assignCall(Call call);
+	boolean assignCall(Call call);
 }
 
 class Call {
