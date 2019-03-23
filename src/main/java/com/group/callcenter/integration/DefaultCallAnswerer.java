@@ -11,7 +11,7 @@ class DefaultCallAnswerer implements CallAnswerer {
 	private ExecutorService executorService;
 	private int ongoingCalls = 0;
 
-	DefaultCallAnswerer(ExecutorService executorService) {
+	public DefaultCallAnswerer(ExecutorService executorService) {
 		this.executorService = executorService;
 	}
 
@@ -21,10 +21,9 @@ class DefaultCallAnswerer implements CallAnswerer {
 	}
 
 	@Override
-	public boolean answerCall(Call call) {
+	public void answerCall(Call call) {
 		incrementOnGoingCalls();
 		doAnswerCall(call);
-		return false;
 	}
 
 	private void doAnswerCall(Call call) {
@@ -34,7 +33,7 @@ class DefaultCallAnswerer implements CallAnswerer {
 					.thenRun(this::decrementOnGoingCalls) //
 					.thenRun(() -> System.out.println("counter decremented to = " + ongoingCalls));
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Error answering call", e);
 		}
 	}
 
