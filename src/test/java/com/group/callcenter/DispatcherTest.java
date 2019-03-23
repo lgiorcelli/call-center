@@ -1,42 +1,58 @@
 package com.group.callcenter;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
 public class DispatcherTest {
+	private Pool supervisorPool;
+	private Pool operatorPool;
+	private Pool managerPool;
+
+	private Call aCall;
+	private RolePriorityDispatcher dispatcher;
+
+	@Before
+	public void setUp() {
+		operatorPool = mock(Pool.class);
+		supervisorPool = mock(Pool.class);
+		managerPool = mock(Pool.class);
+		givenACall();
+	}
 
 	@Test
-	public void assign_a_call_to_a_operator_as_a_first_option() throws Exception {
+	public void assign_a_call_to_a_operator_as_a_first_option() {
 		//GIVEN
-		// operator availables
-		Pool operatorPool = Mockito.mock(Pool.class);
-		// supervisor available
-		Pool supervisorPool = Mockito.mock(Pool.class);
-		// manager available
-		Pool managerPool = Mockito.mock(Pool.class);
-		//a dispatcher with
-		List<Pool> priorityQueue = Lists.newArrayList(operatorPool, supervisorPool, managerPool);
-
-		RolePriorityDispatcher dispatcher = new RolePriorityDispatcher(priorityQueue);
-		//a call
-		Call call = new Call();
+		givenADispatcherWithRolePriority();
 		//WHEN
-		// dispatches a call
-		dispatcher.dispatchCall(call);
+		dispatcher.dispatchCall(aCall);
 		//THEN
-		Mockito.verify(operatorPool).assignCall(call);
-		// an operator receives the call
-		// supervisor did not receive de call
-		Mockito.verifyZeroInteractions(supervisorPool, managerPool);
-		// manager did not receive de call
+		thenOnlyOperatorsAttendsTheCall();
+	}
+
+	private void givenADispatcherWithRolePriority() {
+		List<Pool> priorityQueue = Lists.newArrayList(operatorPool, supervisorPool, managerPool);
+		dispatcher = new RolePriorityDispatcher(priorityQueue);
+	}
+
+	private void thenOnlyOperatorsAttendsTheCall() {
+		verify(operatorPool).assignCall(aCall);
+		verifyZeroInteractions(supervisorPool, managerPool);
+	}
+
+	private void givenACall() {
+		aCall = new Call();
 	}
 }
 
-class RolePriorityDispatcher implements Dispatcher{
+class RolePriorityDispatcher implements Dispatcher {
 	private List<Pool> priorityQueue = Lists.newArrayList();
 
 	public RolePriorityDispatcher(List<Pool> priorityQueue) {
