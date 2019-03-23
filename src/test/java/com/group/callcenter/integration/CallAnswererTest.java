@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-import com.group.callcenter.Call;
+import com.group.callcenter.domain.Call;
+import com.group.callcenter.DefaultCallAnswerer;
 
 public class CallAnswererTest {
 	private RealDurationCallMother callMother = new RealDurationCallMother();
@@ -57,7 +58,7 @@ public class CallAnswererTest {
 	private void sendCallGroup() {
 		List<Call> calls = callMother.aRandomDurationCallList(CALLS_SIZE);
 		for (Call call : calls) {
-			callAnswerer.answerCall(call);
+			callAnswerer.answer(call);
 		}
 	}
 

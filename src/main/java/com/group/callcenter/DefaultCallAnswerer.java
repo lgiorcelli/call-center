@@ -1,12 +1,12 @@
-package com.group.callcenter.integration;
+package com.group.callcenter;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-import com.group.callcenter.Call;
-import com.group.callcenter.CallAnswerer;
+import com.group.callcenter.domain.Call;
+import com.group.callcenter.domain.CallAnswerer;
 
-class DefaultCallAnswerer implements CallAnswerer {
+public class DefaultCallAnswerer implements CallAnswerer {
 
 	private ExecutorService executorService;
 	private int ongoingCalls = 0;
@@ -21,7 +21,7 @@ class DefaultCallAnswerer implements CallAnswerer {
 	}
 
 	@Override
-	public void answerCall(Call call) {
+	public void answer(Call call) {
 		incrementOnGoingCalls();
 		doAnswerCall(call);
 	}

@@ -1,7 +1,7 @@
-package com.group.callcenter;
+package com.group.callcenter.domain;
 
 public interface CallAnswerer {
 	boolean canAnswerCall();
 
-	void answerCall(Call call);
+	void answer(Call call);
 }

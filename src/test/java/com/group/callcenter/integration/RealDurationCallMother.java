@@ -3,7 +3,7 @@ package com.group.callcenter.integration;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.group.callcenter.Call;
+import com.group.callcenter.domain.Call;
 
 public class RealDurationCallMother {
 

@@ -1,4 +1,4 @@
-package com.group.callcenter;
+package com.group.callcenter.domain;
 
 public interface Call {
 
