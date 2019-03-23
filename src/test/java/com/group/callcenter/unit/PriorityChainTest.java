@@ -55,7 +55,7 @@ public class PriorityChainTest {
 		//WHEN
 		whenACallIsDispatched();
 		//THEN
-		thenSupervisorsAttendsTheCall();
+		thenSecondLinkHandleTheCall();
 	}
 
 	@Test
@@ -67,11 +67,10 @@ public class PriorityChainTest {
 
 		whenACallIsDispatched();
 
-		verifyCallsAttended(0, 0);
 
+		thenNoLinksHandleTheCall();
 		thenNoLinkAvailableActionWasCall();
 	}
-
 
 	private void givenAnUnavailableSecondLink() {
 		setGroupAvailability(secondLink, false);
@@ -104,11 +103,15 @@ public class PriorityChainTest {
 		callsHandler.handle(ANY_CALL);
 	}
 
+	private void thenNoLinksHandleTheCall() {
+		verifyCallsAttended(0, 0);
+	}
+
 	private void thenFirstLinkHandleTheCall() {
 		verifyCallsAttended(1, 0);
 	}
 
-	private void thenSupervisorsAttendsTheCall() {
+	private void thenSecondLinkHandleTheCall() {
 		verifyCallsAttended(0, 1);
 	}
 
@@ -117,9 +120,9 @@ public class PriorityChainTest {
 	}
 
 
-	private void verifyCallsAttended(int firstLinkCalls, int supervisorAttendedCalls) {
-		verify(firstLink, times(firstLinkCalls)).answer(ANY_CALL);
-		verify(secondLink, times(supervisorAttendedCalls)).answer(ANY_CALL);
+	private void verifyCallsAttended(int firstLinkHandledCalls, int secondLinkHandledCalls) {
+		verify(firstLink, times(firstLinkHandledCalls)).answer(ANY_CALL);
+		verify(secondLink, times(secondLinkHandledCalls)).answer(ANY_CALL);
 	}
 
 }
