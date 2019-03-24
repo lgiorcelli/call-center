@@ -7,38 +7,38 @@ import static org.mockito.Mockito.when;
 
 import java.util.function.Consumer;
 
+import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
-import com.group.callcenter.domain.priority.CallAnswererWrapper;
-import com.group.callcenter.domain.priority.LastHandlerPriority;
+import com.group.callcenter.domain.priority.CallCenter;
 
 public class PriorityChainTest {
-	private CallAnswerer secondLink;
-	private CallAnswerer firstLink;
-	private Consumer<Call> noLinksAvailable;
+	private CallAnswerer secondGroup;
+	private CallAnswerer firstGroup;
+	private Consumer<Call> noGroupAvailable;
 
 	private Call ANY_CALL = () -> {
 	};
 
-	private CallAnswererWrapper callsHandler;
+	private CallCenter callCenter;
 
 	@Before
 	public void setUp() {
-		firstLink = mock(CallAnswerer.class);
-		secondLink = mock(CallAnswerer.class);
+		firstGroup = mock(CallAnswerer.class);
+		secondGroup = mock(CallAnswerer.class);
 
-		noLinksAvailable = mock(Consumer.class);
+		noGroupAvailable = mock(Consumer.class);
+
+		callCenter = new CallCenter(Lists.newArrayList(firstGroup, secondGroup), noGroupAvailable);
 	}
 
 	@Test
 	public void only_first_link_is_called_if_can_handle_the_call() {
 		//GIVEN
 		givenAnAvailableFirstLink();
-
-		givenAConfiguredResponsabilityChain();
 		//WHEN
 		whenACallIsDispatched();
 		//THEN
@@ -51,7 +51,6 @@ public class PriorityChainTest {
 		givenAnUnavailableFirstLink();
 		givenAnAvailableSecondLink();
 
-		givenAConfiguredResponsabilityChain();
 		//WHEN
 		whenACallIsDispatched();
 		//THEN
@@ -63,44 +62,35 @@ public class PriorityChainTest {
 		givenAnUnavailableFirstLink();
 		givenAnUnavailableSecondLink();
 
-		givenAConfiguredResponsabilityChain();
-
 		whenACallIsDispatched();
-
 
 		thenNoLinksHandleTheCall();
 		thenNoLinkAvailableActionWasCall();
 	}
 
 	private void givenAnUnavailableSecondLink() {
-		setGroupAvailability(secondLink, false);
+		setGroupAvailability(secondGroup, false);
 	}
 
 	private void givenAnAvailableFirstLink() {
-		setGroupAvailability(firstLink, true);
+		setGroupAvailability(firstGroup, true);
 	}
 
 	private void givenAnAvailableSecondLink() {
-		setGroupAvailability(secondLink, true);
+		setGroupAvailability(secondGroup, true);
 	}
 
 	private void givenAnUnavailableFirstLink() {
-		setGroupAvailability(firstLink, false);
+		setGroupAvailability(firstGroup, false);
 	}
 
 	private void setGroupAvailability(CallAnswerer managerPool, boolean availability) {
 		when(managerPool.canAnswerCall()).thenReturn(availability);
 	}
 
-	private void givenAConfiguredResponsabilityChain() {
-		LastHandlerPriority lastHandler = new LastHandlerPriority(noLinksAvailable);
-		CallAnswererWrapper supervisorsHandler = new CallAnswererWrapper(secondLink, lastHandler);
-		callsHandler = new CallAnswererWrapper(firstLink, supervisorsHandler);
-
-	}
 
 	private void whenACallIsDispatched() {
-		callsHandler.handle(ANY_CALL);
+		callCenter.accept(ANY_CALL);
 	}
 
 	private void thenNoLinksHandleTheCall() {
@@ -116,13 +106,12 @@ public class PriorityChainTest {
 	}
 
 	private void thenNoLinkAvailableActionWasCall() {
-		verify(noLinksAvailable).accept(ANY_CALL);
+		verify(noGroupAvailable).accept(ANY_CALL);
 	}
 
-
 	private void verifyCallsAttended(int firstLinkHandledCalls, int secondLinkHandledCalls) {
-		verify(firstLink, times(firstLinkHandledCalls)).answer(ANY_CALL);
-		verify(secondLink, times(secondLinkHandledCalls)).answer(ANY_CALL);
+		verify(firstGroup, times(firstLinkHandledCalls)).answer(ANY_CALL);
+		verify(secondGroup, times(secondLinkHandledCalls)).answer(ANY_CALL);
 	}
 
 }

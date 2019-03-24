@@ -19,8 +19,7 @@ import org.junit.Test;
 import com.group.callcenter.DefaultCallAnswerer;
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
-import com.group.callcenter.domain.priority.CallAnswererWrapper;
-import com.group.callcenter.domain.priority.LastHandlerPriority;
+import com.group.callcenter.domain.priority.CallCenter;
 
 public class DispatcherTest {
 	private Call call = mock(Call.class);
@@ -28,16 +27,14 @@ public class DispatcherTest {
 	private List<CallAnswerer> answererGroup;
 	private Dispatcher dispatcher;
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private CallCenter callCenter;
 
 	@Before
 	public void setUp() {
 		DefaultCallAnswerer defaultGroup = new DefaultCallAnswerer(executorService, 10, call -> System.out.println("Finished call = " + call));
 		answererGroup = Lists.newArrayList(defaultGroup);
 
-
-		new CallAnswererWrapper(defaultGroup, new LastHandlerPriority(call -> {
-			throw new RuntimeException("call must be handled");
-		}));
+		callCenter = new CallCenter(answererGroup, call -> System.out.println("Handler invoked"));
 
 		onDispatcherCapacityExceeded = mock(Consumer.class);
 	}
@@ -110,7 +107,7 @@ public class DispatcherTest {
 	}
 
 	private Dispatcher aDispatcherWithCapacity(int capacity) {
-		return new Dispatcher(answererGroup, onDispatcherCapacityExceeded, capacity);
+		return new Dispatcher(onDispatcherCapacityExceeded, capacity, callCenter);
 	}
 
 	public class Dispatcher {
@@ -119,10 +116,10 @@ public class DispatcherTest {
 		private int maxOngoingCalls;
 		private CallCenter callCenter;
 
-		public Dispatcher(List<CallAnswerer> answererGroup, Consumer<Call> onDispatcherCapacityExceeded, int maxOngoingCalls) {
+		public Dispatcher(Consumer<Call> onDispatcherCapacityExceeded, int maxOngoingCalls, CallCenter callCenter) {
 			this.onDispatcherCapacityExceeded = onDispatcherCapacityExceeded;
 			this.maxOngoingCalls = maxOngoingCalls;
-			this.callCenter = new CallCenter(answererGroup, call -> System.out.println("Handler invoked"));
+			this.callCenter = callCenter;
 		}
 
 		void dispatchCall(Call call) {
@@ -151,26 +148,4 @@ public class DispatcherTest {
 		}
 	}
 
-	public class CallCenter {
-		private List<CallAnswerer> answererGroups;
-		private Consumer<Call> onNoEmployeeAvailable;
-
-		public CallCenter(List<CallAnswerer> answererGroups, Consumer<Call> onNoEmployeeAvailable) {
-			this.answererGroups = answererGroups;
-			this.onNoEmployeeAvailable = onNoEmployeeAvailable;
-		}
-
-		public void accept(Call call) {
-			boolean callAnswered = false;
-			for (CallAnswerer group : answererGroups) {
-				if (group.canAnswerCall()) {
-					callAnswered = true;
-					group.answer(call);
-				}
-			}
-			if (!callAnswered) {
-				onNoEmployeeAvailable.accept(call);
-			}
-		}
-	}
 }
