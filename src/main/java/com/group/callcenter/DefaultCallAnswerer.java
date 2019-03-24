@@ -1,11 +1,13 @@
 package com.group.callcenter;
 
+import java.security.InvalidParameterException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 
 public class DefaultCallAnswerer implements CallAnswerer {
 
@@ -17,6 +19,15 @@ public class DefaultCallAnswerer implements CallAnswerer {
 	public DefaultCallAnswerer(ExecutorService executorService, int maxOngoingCalls, Consumer<Call> onCallFinished) {
 		this.executorService = executorService;
 		this.maxOngoingCalls = maxOngoingCalls;
+		this.onCallFinished = onCallFinished;
+	}
+
+
+	@Override
+	public void setOnCallFinished(Consumer<Call> onCallFinished) {
+		if (onCallFinished == null) {
+			throw new InvalidParameterException("OnCallFinished consumer must not be null");
+		}
 		this.onCallFinished = onCallFinished;
 	}
 

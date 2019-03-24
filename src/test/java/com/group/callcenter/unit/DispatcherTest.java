@@ -11,10 +11,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.group.callcenter.DefaultCallAnswerer;
 import com.group.callcenter.domain.Call;
@@ -28,13 +28,18 @@ public class DispatcherTest {
 	private Dispatcher dispatcher;
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private CallCenter callCenter;
+	private Consumer<Call> onCallFinished;
 
 	@Before
 	public void setUp() {
-		DefaultCallAnswerer defaultGroup = new DefaultCallAnswerer(executorService, 10, call -> System.out.println("Finished call = " + call));
+		onCallFinished = mock(Consumer.class);
+
+		DefaultCallAnswerer defaultGroup = new DefaultCallAnswerer(executorService, 10,
+				call -> System.out.println("Finished call = " + call));
 		answererGroup = Lists.newArrayList(defaultGroup);
 
-		callCenter = new CallCenter(answererGroup, call -> System.out.println("Handler invoked"));
+		callCenter = new CallCenter(answererGroup, onCallFinished);
+		callCenter.setOnNoEmployeeAvailable(call -> System.out.println("Handler invoked"));
 
 		onDispatcherCapacityExceeded = mock(Consumer.class);
 	}
@@ -47,7 +52,7 @@ public class DispatcherTest {
 		//THEN
 		thenCallIsDispatched();
 		thenOnCapacityExceedWasNotCalled();
-		Assertions.assertThat(dispatcher.currentOngoingCalls).isEqualTo(1);
+		Mockito.verify(onCallFinished).accept(call);
 	}
 
 	@Test
@@ -59,14 +64,13 @@ public class DispatcherTest {
 		//THEN
 		thenOnCapacityExceededWasCalled();
 		thenCallWasNotDispatched();
-		Assertions.assertThat(dispatcher.currentOngoingCalls).isEqualTo(0);
 	}
 
 	@Test
 	public void decrease_ongoing_calls_when_a_call_ends() {
 		//GIVEN
 		givenADispatcherWithRemainingCapacity();
-		dispatcher.handleCall(call);
+		dispatcher.dispatchCall(call);
 		//WHEN
 
 		//THEN
@@ -108,44 +112,6 @@ public class DispatcherTest {
 
 	private Dispatcher aDispatcherWithCapacity(int capacity) {
 		return new Dispatcher(onDispatcherCapacityExceeded, capacity, callCenter);
-	}
-
-	public class Dispatcher {
-		private Consumer<Call> onDispatcherCapacityExceeded;
-		private int currentOngoingCalls = 0;
-		private int maxOngoingCalls;
-		private CallCenter callCenter;
-
-		public Dispatcher(Consumer<Call> onDispatcherCapacityExceeded, int maxOngoingCalls, CallCenter callCenter) {
-			this.onDispatcherCapacityExceeded = onDispatcherCapacityExceeded;
-			this.maxOngoingCalls = maxOngoingCalls;
-			this.callCenter = callCenter;
-		}
-
-		void dispatchCall(Call call) {
-			if (hasRemainingCapacity()) {
-				handleCall(call);
-			} else {
-				onDispatcherCapacityExceeded.accept(call);
-			}
-		}
-
-		private boolean hasRemainingCapacity() {
-			return currentOngoingCalls < maxOngoingCalls;
-		}
-
-		private void handleCall(Call call) {
-			incrementOngoingCalls();
-			callCenter.accept(call);
-		}
-
-		private void incrementOngoingCalls() {
-			currentOngoingCalls++;
-		}
-
-		private void decreaseOnGoingCalls() {
-			currentOngoingCalls--;
-		}
 	}
 
 }
