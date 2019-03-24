@@ -46,6 +46,12 @@
 			<version>3.8.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.etermax.hermes.inbox</groupId>
+			<artifactId>api</artifactId>
+			<version>1.11.9-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 		<!--Test dependencies-->
 	</dependencies>
 

@@ -21,7 +21,7 @@ public class CallCenter {
 		this.onNoEmployeeAvailable = onNoEmployeeAvailable;
 	}
 
-	public void accept(Call call) {
+	public synchronized void accept(Call call) {
 		boolean callAnswered = false;
 		for (CallAnswerer group : answererGroups) {
 			if (group.canAnswerCall()) {

@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,18 +25,17 @@ import com.group.callcenter.domain.priority.CallCenter;
 public class DispatcherTest {
 	private Call call = mock(Call.class);
 	private Consumer<Call> onDispatcherCapacityExceeded;
-	private List<CallAnswerer> answererGroup;
 	private Dispatcher dispatcher;
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private CallCenter callCenter;
 	private Consumer<Call> onCallFinished;
+		private List<CallAnswerer> answererGroup;
 
 	@Before
 	public void setUp() {
 		onCallFinished = mock(Consumer.class);
 
-		DefaultCallAnswerer defaultGroup = new DefaultCallAnswerer(executorService, 10,
-				call -> System.out.println("Finished call = " + call));
+		DefaultCallAnswerer defaultGroup = new DefaultCallAnswerer(executorService, 10);
 		answererGroup = Lists.newArrayList(defaultGroup);
 
 		callCenter = new CallCenter(answererGroup, onCallFinished);
@@ -45,7 +45,7 @@ public class DispatcherTest {
 	}
 
 	@Test
-	public void call_PriorityHandler_when_a_call_arrives_and_has_answer_capacity() {
+	public void a_call_is_dispatched_when_has_answer_capacity() {
 		givenADispatcherWithRemainingCapacity();
 		//WHEN
 		whenACallArrives();
@@ -64,17 +64,29 @@ public class DispatcherTest {
 		//THEN
 		thenOnCapacityExceededWasCalled();
 		thenCallWasNotDispatched();
+		Mockito.verifyZeroInteractions(onCallFinished);
+	}
+
+	@Test
+	public void increase_ongoing_calls_when_a_call_ends() {
+		//GIVEN
+		callCenter = mock(CallCenter.class);
+		givenADispatcherWithRemainingCapacity();
+		//WHEN
+		dispatcher.dispatchCall(call);
+		//THEN
+		Assertions.assertThat(dispatcher.getCurrentOngoingCalls()).isEqualTo(1);
 	}
 
 	@Test
 	public void decrease_ongoing_calls_when_a_call_ends() {
 		//GIVEN
+		callCenter = new CallCenter(answererGroup, call -> dispatcher.decreaseOnGoingCalls());
 		givenADispatcherWithRemainingCapacity();
-		dispatcher.dispatchCall(call);
 		//WHEN
-
+		whenACallArrives();
 		//THEN
-		//
+		Assertions.assertThat(dispatcher.getCurrentOngoingCalls()).isEqualTo(0);
 	}
 
 	private void givenADispatcherAtItsLimit() {

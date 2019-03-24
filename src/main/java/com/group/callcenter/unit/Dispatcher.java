@@ -17,7 +17,7 @@ public class Dispatcher {
 		this.callCenter = callCenter;
 	}
 
-	public void dispatchCall(Call call) {
+	public synchronized void dispatchCall(Call call) {
 		if (hasRemainingCapacity()) {
 			handleCall(call);
 		} else {
@@ -25,20 +25,25 @@ public class Dispatcher {
 		}
 	}
 
+	public int getCurrentOngoingCalls() {
+		return currentOngoingCalls;
+	}
+
 	private boolean hasRemainingCapacity() {
 		return currentOngoingCalls < maxOngoingCalls;
 	}
 
-	private void handleCall(Call call) {
-		incrementOngoingCalls();
+	private synchronized void handleCall(Call call) {
+		int currentCalls = incrementOngoingCalls();
+		System.out.println(String.format("Handling call %s. Ongoing calls: %d", call, currentCalls));
 		callCenter.accept(call);
 	}
 
-	private void incrementOngoingCalls() {
-		currentOngoingCalls++;
+	private synchronized int incrementOngoingCalls() {
+		return currentOngoingCalls++;
 	}
 
-	private void decreaseOnGoingCalls() {
+	public synchronized void decreaseOnGoingCalls() {
 		currentOngoingCalls--;
 	}
 }

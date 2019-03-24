@@ -14,12 +14,11 @@ public class DefaultCallAnswerer implements CallAnswerer {
 	private ExecutorService executorService;
 	private int ongoingCalls = 0;
 	private int maxOngoingCalls;
-	private Consumer<Call> onCallFinished;
+	private Consumer<Call> onCallFinished = call -> {};
 
-	public DefaultCallAnswerer(ExecutorService executorService, int maxOngoingCalls, Consumer<Call> onCallFinished) {
+	public DefaultCallAnswerer(ExecutorService executorService, int maxOngoingCalls) {
 		this.executorService = executorService;
 		this.maxOngoingCalls = maxOngoingCalls;
-		this.onCallFinished = onCallFinished;
 	}
 
 
@@ -37,7 +36,7 @@ public class DefaultCallAnswerer implements CallAnswerer {
 	}
 
 	@Override
-	public void answer(Call call) {
+	public void  answer(Call call) {
 		incrementOnGoingCalls();
 		doAnswerCall(call);
 	}
@@ -47,8 +46,7 @@ public class DefaultCallAnswerer implements CallAnswerer {
 			CompletableFuture //
 					.runAsync(call::link, executorService) //
 					.thenRun(this::decrementOnGoingCalls) //
-					.thenRun(() -> onCallFinished.accept(call))
-					.thenRun(() -> System.out.println("counter decremented to = " + ongoingCalls));
+					.thenRun(() -> onCallFinished.accept(call));
 		} catch (Exception e) {
 			throw new RuntimeException("Error answering call", e);
 		}
