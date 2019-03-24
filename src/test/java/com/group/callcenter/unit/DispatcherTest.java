@@ -2,6 +2,7 @@ package com.group.callcenter.unit;
 
 import java.util.function.Consumer;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -14,6 +15,7 @@ public class DispatcherTest {
 	};
 	private Consumer<Call> onDispatcherCapacityExceeded;
 	private PriorityChainHandler priorityHandler;
+	private Dispatcher dispatcher;
 
 	@Before
 	public void setUp() {
@@ -23,23 +25,58 @@ public class DispatcherTest {
 
 	@Test
 	public void call_PriorityHandler_when_a_call_arrives_and_has_answer_capacity() {
-		Dispatcher dispatcher = new Dispatcher(priorityHandler, onDispatcherCapacityExceeded, 10);
+		givenADispatcherWithRemainingCapacity();
 		//WHEN
-		dispatcher.dispatchCall(call);
+		whenACallArrives();
 		//THEN
-		Mockito.verify(priorityHandler).handle(call);
-		Mockito.verifyZeroInteractions(priorityHandler);
+		thenCallIsDispatched();
+		thenOnCapacityExceedWasNotCalled();
+		Assertions.assertThat(dispatcher.currentOngoingCalls).isEqualTo(1);
 	}
 
 	@Test
 	public void handle_a_call_when_exceeds_answer_capacity() {
 		//GIVEN
-		Dispatcher dispatcher = new Dispatcher(priorityHandler, onDispatcherCapacityExceeded, 0);
+		givenADispatcherAtItsLimit();
 		//WHEN
-		dispatcher.dispatchCall(call);
+		whenACallArrives();
 		//THEN
+		thenOnCapacityExceededWasCalled();
+		thenCallWasNotDispatched();
+	}
+
+
+	private void givenADispatcherAtItsLimit() {
+		dispatcher = aDispatcherWithCapacity(0);
+	}
+
+	private void givenADispatcherWithRemainingCapacity() {
+		dispatcher = aDispatcherWithCapacity(10);
+	}
+
+	private void whenACallArrives() {
+		dispatcher.dispatchCall(call);
+	}
+
+	private void thenOnCapacityExceededWasCalled() {
 		Mockito.verify(onDispatcherCapacityExceeded).accept(call);
+	}
+
+	private void thenCallWasNotDispatched() {
 		Mockito.verifyZeroInteractions(priorityHandler);
+	}
+
+	private void thenOnCapacityExceedWasNotCalled() {
+		Mockito.verifyZeroInteractions(onDispatcherCapacityExceeded);
+	}
+
+	private void thenCallIsDispatched() {
+		Mockito.verify(priorityHandler).handle(call);
+	}
+
+
+	private Dispatcher aDispatcherWithCapacity(int capacity) {
+		return new Dispatcher(priorityHandler, onDispatcherCapacityExceeded, capacity);
 	}
 
 	public class Dispatcher {
@@ -55,11 +92,24 @@ public class DispatcherTest {
 		}
 
 		void dispatchCall(Call call) {
-			if (currentOngoingCalls >= maxOngoingCalls) {
-				onDispatcherCapacityExceeded.accept(call);
+			if (hasRemainingCapacity()) {
+				handleCall(call);
 			} else {
-				priorityHandler.handle(call);
+				onDispatcherCapacityExceeded.accept(call);
 			}
+		}
+
+		private boolean hasRemainingCapacity() {
+			return currentOngoingCalls < maxOngoingCalls;
+		}
+
+		private void handleCall(Call call) {
+			incrementOngoingCalls();
+			priorityHandler.handle(call);
+		}
+
+		private void incrementOngoingCalls() {
+			currentOngoingCalls++;
 		}
 	}
 }
