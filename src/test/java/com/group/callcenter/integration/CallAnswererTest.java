@@ -49,7 +49,7 @@ public class CallAnswererTest {
 
 	private void waitForCompletion() {
 		try {
-			TimeUnit.SECONDS.sleep(11);
+			TimeUnit.SECONDS.sleep(6);
 		} catch (InterruptedException e) {
 			throw new RuntimeException("Error esperando a que termine el test",e);
 		}
@@ -63,7 +63,7 @@ public class CallAnswererTest {
 	}
 
 	private void givenADefaultCallAnswer() {
-		callAnswerer = new DefaultCallAnswerer(executorService);
+		callAnswerer = new DefaultCallAnswerer(executorService, 10, call -> System.out.println("Finished call = " + call));
 	}
 
 	private void givenAnExecutorWithCapacityForAllCalls() {
