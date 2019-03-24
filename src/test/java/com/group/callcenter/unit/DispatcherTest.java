@@ -29,7 +29,7 @@ public class DispatcherTest {
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private CallCenter callCenter;
 	private Consumer<Call> onCallFinished;
-		private List<CallAnswerer> answererGroup;
+	private List<CallAnswerer> answererGroup;
 
 	@Before
 	public void setUp() {
@@ -123,7 +123,7 @@ public class DispatcherTest {
 	}
 
 	private Dispatcher aDispatcherWithCapacity(int capacity) {
-		return new Dispatcher(onDispatcherCapacityExceeded, capacity, callCenter);
+		return new Dispatcher(onDispatcherCapacityExceeded, capacity, callCenter, executorService, call ->{});
 	}
 
 }

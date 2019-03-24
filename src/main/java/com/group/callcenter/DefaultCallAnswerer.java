@@ -7,20 +7,19 @@ import java.util.function.Consumer;
 
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 
 public class DefaultCallAnswerer implements CallAnswerer {
 
 	private ExecutorService executorService;
 	private int ongoingCalls = 0;
 	private int maxOngoingCalls;
-	private Consumer<Call> onCallFinished = call -> {};
+	private Consumer<Call> onCallFinished = call -> {
+	};
 
 	public DefaultCallAnswerer(ExecutorService executorService, int maxOngoingCalls) {
 		this.executorService = executorService;
 		this.maxOngoingCalls = maxOngoingCalls;
 	}
-
 
 	@Override
 	public void setOnCallFinished(Consumer<Call> onCallFinished) {
@@ -36,9 +35,14 @@ public class DefaultCallAnswerer implements CallAnswerer {
 	}
 
 	@Override
-	public void  answer(Call call) {
+	public void answer(Call call) {
 		incrementOnGoingCalls();
 		doAnswerCall(call);
+	}
+
+	@Override
+	public String getName() {
+		return "";
 	}
 
 	private void doAnswerCall(Call call) {

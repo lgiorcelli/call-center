@@ -21,10 +21,15 @@ public class CallCenter {
 		this.onNoEmployeeAvailable = onNoEmployeeAvailable;
 	}
 
-	public synchronized void accept(Call call) {
+	public List<CallAnswerer> getAnswererGroups() {
+		return answererGroups;
+	}
+
+	public void accept(Call call) {
 		boolean callAnswered = false;
 		for (CallAnswerer group : answererGroups) {
 			if (group.canAnswerCall()) {
+				System.out.println(String.format("Call %s Attended by %s", call, group.getName()));
 				callAnswered = true;
 				group.answer(call);
 			}
