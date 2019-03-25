@@ -34,8 +34,9 @@ public class PriorityChainTest {
 
 		noGroupAvailable = mock(Consumer.class);
 
-		callCenter = new CallCenter(Lists.newArrayList(firstGroup, secondGroup), onCallFinished);
+		callCenter = new CallCenter(Lists.newArrayList(firstGroup, secondGroup));
 		callCenter.setOnNoEmployeeAvailable(noGroupAvailable);
+		callCenter.setOnCallFinished(onCallFinished);
 	}
 
 	@Test

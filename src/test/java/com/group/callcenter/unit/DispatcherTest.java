@@ -29,16 +29,15 @@ public class DispatcherTest {
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private CallCenter callCenter;
 	private Consumer<Call> onCallFinished;
-	private List<CallAnswerer> answererGroup;
 
 	@Before
 	public void setUp() {
 		onCallFinished = mock(Consumer.class);
 
 		DefaultCallAnswerer defaultGroup = new DefaultCallAnswerer(executorService, 10);
-		answererGroup = Lists.newArrayList(defaultGroup);
+		List<CallAnswerer> answererGroup = Lists.newArrayList(defaultGroup);
 
-		callCenter = new CallCenter(answererGroup, onCallFinished);
+		callCenter = new CallCenter(answererGroup);
 		callCenter.setOnNoEmployeeAvailable(call -> System.out.println("Handler invoked"));
 
 		onDispatcherCapacityExceeded = mock(Consumer.class);
@@ -52,7 +51,6 @@ public class DispatcherTest {
 		//THEN
 		thenCallIsDispatched();
 		thenOnCapacityExceedWasNotCalled();
-		Mockito.verify(onCallFinished).accept(call);
 	}
 
 	@Test
@@ -78,16 +76,6 @@ public class DispatcherTest {
 		Assertions.assertThat(dispatcher.getCurrentOngoingCalls()).isEqualTo(1);
 	}
 
-	@Test
-	public void decrease_ongoing_calls_when_a_call_ends() {
-		//GIVEN
-		callCenter = new CallCenter(answererGroup, call -> dispatcher.decreaseOnGoingCalls());
-		givenADispatcherWithRemainingCapacity();
-		//WHEN
-		whenACallArrives();
-		//THEN
-		Assertions.assertThat(dispatcher.getCurrentOngoingCalls()).isEqualTo(0);
-	}
 
 	private void givenADispatcherAtItsLimit() {
 		dispatcher = aDispatcherWithCapacity(0);

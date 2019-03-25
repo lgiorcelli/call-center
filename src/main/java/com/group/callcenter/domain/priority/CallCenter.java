@@ -8,11 +8,16 @@ import com.group.callcenter.domain.CallAnswerer;
 
 public class CallCenter {
 	private final List<CallAnswerer> answererGroups;
+	private Consumer<Call> onCallFinished = call -> {};
 	private Consumer<Call> onNoEmployeeAvailable = call -> {
 	};
 
-	public CallCenter(List<CallAnswerer> answererGroups, Consumer<Call> onCallFinished) {
+	public CallCenter(List<CallAnswerer> answererGroups) {
 		this.answererGroups = answererGroups;
+	}
+
+
+	public void setOnCallFinished(Consumer<Call> onCallFinished) {
 		for (CallAnswerer group : this.answererGroups) {
 			group.setOnCallFinished(onCallFinished);
 		}
@@ -42,4 +47,5 @@ public class CallCenter {
 		}
 		return null;
 	}
+
 }
