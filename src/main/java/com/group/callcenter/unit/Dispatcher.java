@@ -29,7 +29,6 @@ public class Dispatcher {
 		if (hasRemainingCapacity()) {
 			handleCall(call);
 		} else {
-			LOGGER.info("Dispatcher rejects call: " + call);
 			onDispatcherCapacityExceeded.accept(call);
 		}
 	}

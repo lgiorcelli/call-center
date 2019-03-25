@@ -2,17 +2,14 @@ package com.group.callcenter.integration;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-
 import com.group.callcenter.domain.Call;
 
 public class MockedTimeDurationCall implements Call {
 
 	private final int duration;
-	private int id;
+	private String id;
 
-	public MockedTimeDurationCall(int duration, int id) {
+	public MockedTimeDurationCall(int duration, String id) {
 		this.id = id;
 		this.duration = duration;
 	}
@@ -21,10 +18,6 @@ public class MockedTimeDurationCall implements Call {
 		System.out.println("Linked call " + this);
 		sleep();
 		System.out.println(String.format("Call %s Finished after %d seconds", this, duration));
-	}
-
-	public int getId() {
-		return id;
 	}
 
 	private void sleep() {

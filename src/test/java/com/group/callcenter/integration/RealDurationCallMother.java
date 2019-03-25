@@ -14,16 +14,17 @@ public class RealDurationCallMother {
 	private Random random = new Random();
 	private int counter = 0;
 
-	public List<Call> aRandomDurationCallList(int size) {
+	public List<Call> aRandomDurationCallList(int size, int groupId) {
 		List<Call> calls = Lists.newArrayList();
 		for (int i = 0; i < size; i++) {
-			calls.add(aCall());
+			calls.add(aCall(groupId));
 		}
 		return calls;
 	}
 
-	public MockedTimeDurationCall aCall() {
-		return new MockedTimeDurationCall(getRandomDuration(MIN_DURATION_IN_SECONDS, MAX_DURATION_IN_SECONDS), ++counter);
+	public MockedTimeDurationCall aCall(int groupId) {
+		String id = String.format("%d-%d", groupId, ++counter);
+		return new MockedTimeDurationCall(getRandomDuration(MIN_DURATION_IN_SECONDS, MAX_DURATION_IN_SECONDS), id);
 	}
 
 	private int getRandomDuration(int minDurationInSeconds, int maxDurationInSeconds) {

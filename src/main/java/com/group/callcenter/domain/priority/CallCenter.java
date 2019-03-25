@@ -7,8 +7,9 @@ import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
 
 public class CallCenter {
-	private List<CallAnswerer> answererGroups;
-	private Consumer<Call> onNoEmployeeAvailable = call -> {};
+	private final List<CallAnswerer> answererGroups;
+	private Consumer<Call> onNoEmployeeAvailable = call -> {
+	};
 
 	public CallCenter(List<CallAnswerer> answererGroups, Consumer<Call> onCallFinished) {
 		this.answererGroups = answererGroups;
@@ -21,21 +22,24 @@ public class CallCenter {
 		this.onNoEmployeeAvailable = onNoEmployeeAvailable;
 	}
 
-	public List<CallAnswerer> getAnswererGroups() {
-		return answererGroups;
-	}
-
 	public void accept(Call call) {
-		boolean callAnswered = false;
-		for (CallAnswerer group : answererGroups) {
-			if (group.canAnswerCall()) {
-				System.out.println(String.format("Call %s Attended by %s", call, group.getName()));
-				callAnswered = true;
-				group.answer(call);
-			}
-		}
-		if (!callAnswered) {
+		CallAnswerer availableGroup = selectAvailableGroup();
+		if (availableGroup != null) {
+			System.out.println(String.format("Call %s Attended by %s", call, availableGroup.getName()));
+			availableGroup.answer(call);
+		} else {
 			onNoEmployeeAvailable.accept(call);
 		}
+	}
+
+	private CallAnswerer selectAvailableGroup() {
+		synchronized (answererGroups) {
+			for (CallAnswerer group : answererGroups) {
+				if (group.canAnswerCall()) {
+					return group;
+				}
+			}
+		}
+		return null;
 	}
 }
