@@ -28,6 +28,7 @@ public class DispatcherIntegrationTest {
 		givenAProductionReadyDispatcher();
 
 		whenSeveralCallsArrivesInDifferentThreads();
+		afterWaitForCompletion();
 
 		thenThereIsNoOnGoingCalls();
 	}
@@ -42,7 +43,6 @@ public class DispatcherIntegrationTest {
 
 	private void whenSeveralCallsArrivesInDifferentThreads() {
 		sendCallsInParallelThread();
-		waitForCompletion();
 	}
 
 	private void sendCallsInParallelThread() {
@@ -52,7 +52,7 @@ public class DispatcherIntegrationTest {
 		}
 	}
 
-	private void waitForCompletion() {
+	private void afterWaitForCompletion() {
 		try {
 			TimeUnit.SECONDS.sleep(TEST_TIMEOUT);
 		} catch (InterruptedException e) {

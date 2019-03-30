@@ -24,19 +24,16 @@ public class PriorityChainTest {
 	};
 
 	private CallCenter callCenter;
-	private Consumer<Call> onCallFinished;
 
 	@Before
 	public void setUp() {
 		firstGroup = mock(CallAnswerer.class);
 		secondGroup = mock(CallAnswerer.class);
-		onCallFinished = mock(Consumer.class);
 
 		noGroupAvailable = mock(Consumer.class);
 
 		callCenter = new CallCenter(Lists.newArrayList(firstGroup, secondGroup));
 		callCenter.setOnNoEmployeeAvailable(noGroupAvailable);
-		callCenter.setOnCallFinished(onCallFinished);
 	}
 
 	@Test

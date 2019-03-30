@@ -2,7 +2,6 @@ package com.group.callcenter.integration;
 
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 import com.google.common.collect.Lists;
 import com.group.callcenter.domain.Call;
@@ -24,12 +23,11 @@ public class RealDurationCallMother {
 
 	public MockedTimeDurationCall aCall(int groupId) {
 		String id = String.format("%d-%d", groupId, ++counter);
-		return new MockedTimeDurationCall(getRandomDuration(MIN_DURATION_IN_SECONDS, MAX_DURATION_IN_SECONDS), id);
+		return new MockedTimeDurationCall(getRandomDuration(), id);
 	}
 
-	private int getRandomDuration(int minDurationInSeconds, int maxDurationInSeconds) {
-		return random.nextInt((maxDurationInSeconds - minDurationInSeconds) + 1) + minDurationInSeconds;
+	private int getRandomDuration() {
+		return random.nextInt((MAX_DURATION_IN_SECONDS - MIN_DURATION_IN_SECONDS) + 1) + MIN_DURATION_IN_SECONDS;
 	}
-
 
 }

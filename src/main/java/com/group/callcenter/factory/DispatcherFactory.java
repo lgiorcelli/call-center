@@ -17,6 +17,8 @@ import com.group.callcenter.infrastructure.FixedCapacityCallAnswerer;
 
 public class DispatcherFactory {
 	private static final Logger logger = LoggerFactory.getLogger(DispatcherFactory.class);
+	private static final int MAX_ONGOING_CALLS = 10;
+
 
 	public Dispatcher create() {
 		ExecutorService executorService = Executors.newFixedThreadPool(100);
@@ -28,7 +30,10 @@ public class DispatcherFactory {
 
 		CallCenter callCenter = new CallCenter(answerPriority);
 
-		return new Dispatcher(onDispatcherCapacityExceeded, 10, callCenter, executorService,
+		return new Dispatcher(onDispatcherCapacityExceeded, //
+				MAX_ONGOING_CALLS, //
+				callCenter, //
+				executorService, //
 				call -> logger.info("No employees availables for call {}", call));
 	}
 }

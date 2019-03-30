@@ -17,11 +17,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.group.callcenter.infrastructure.DefaultCallAnswerer;
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
 import com.group.callcenter.domain.CallCenter;
 import com.group.callcenter.domain.Dispatcher;
+import com.group.callcenter.infrastructure.FixedCapacityCallAnswerer;
 
 public class DispatcherTest {
 	private Call call = mock(Call.class);
@@ -35,7 +35,7 @@ public class DispatcherTest {
 	public void setUp() {
 		onCallFinished = mock(Consumer.class);
 
-		DefaultCallAnswerer defaultGroup = new DefaultCallAnswerer(executorService, 10);
+		FixedCapacityCallAnswerer defaultGroup = new FixedCapacityCallAnswerer("default", 1F);
 		List<CallAnswerer> answererGroup = Lists.newArrayList(defaultGroup);
 
 		callCenter = new CallCenter(answererGroup);

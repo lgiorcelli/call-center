@@ -1,6 +1,7 @@
 package com.group.callcenter.domain;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -16,36 +17,30 @@ public class CallCenter {
 		this.answererGroups = answererGroups;
 	}
 
-
-	public void setOnCallFinished(Consumer<Call> onCallFinished) {
-		for (CallAnswerer group : this.answererGroups) {
-			group.setOnCallFinished(onCallFinished);
-		}
-	}
-
 	public void setOnNoEmployeeAvailable(Consumer<Call> onNoEmployeeAvailable) {
 		this.onNoEmployeeAvailable = onNoEmployeeAvailable;
 	}
 
 	public void accept(Call call) {
-		CallAnswerer availableGroup = selectAvailableGroup();
-		if (availableGroup != null) {
-			logger.info("Call {} attended by {}", call, availableGroup.getName());
-			availableGroup.answer(call);
+		Optional<CallAnswerer> availableGroup = selectAvailableGroup();
+		if (availableGroup.isPresent()) {
+			CallAnswerer answerer = availableGroup.get();
+			logger.info("Call {} attended by {}", call, answerer.getName());
+			answerer.answer(call);
 		} else {
 			onNoEmployeeAvailable.accept(call);
 		}
 	}
 
-	private CallAnswerer selectAvailableGroup() {
+	private Optional<CallAnswerer> selectAvailableGroup() {
 		synchronized (answererGroups) {
 			for (CallAnswerer group : answererGroups) {
 				if (group.canAnswerCall()) {
-					return group;
+					return Optional.of(group);
 				}
 			}
 		}
-		return null;
+		return Optional.empty();
 	}
 
 }

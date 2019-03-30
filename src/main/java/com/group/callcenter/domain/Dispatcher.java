@@ -21,7 +21,6 @@ public class Dispatcher {
 		this.maxOngoingCalls = maxOngoingCalls;
 		this.callCenter = callCenter;
 		callCenter.setOnNoEmployeeAvailable(onNoEmployeeAvailable);
-		callCenter.setOnCallFinished(call -> decreaseOnGoingCalls());
 		this.executorService = executorService;
 	}
 

@@ -16,14 +16,9 @@ public class FixedCapacityCallAnswerer implements CallAnswerer {
 	Random random = new Random();
 
 
-	public FixedCapacityCallAnswerer(String name, float probability) {
-		this.name = name;
-		this.probability = probability;
-	}
-
-	@Override
-	public void setOnCallFinished(Consumer<Call> onCallFinished) {
-
+	public FixedCapacityCallAnswerer(String groupName, float answerProbability) {
+		this.name = groupName;
+		this.probability = answerProbability;
 	}
 
 	@Override
