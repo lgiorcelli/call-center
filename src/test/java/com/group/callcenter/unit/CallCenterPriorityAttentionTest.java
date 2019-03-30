@@ -15,7 +15,7 @@ import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
 import com.group.callcenter.domain.CallCenter;
 
-public class PriorityChainTest {
+public class CallCenterPriorityAttentionTest {
 	private CallAnswerer secondGroup;
 	private CallAnswerer firstGroup;
 	private Consumer<Call> noGroupAvailable;
