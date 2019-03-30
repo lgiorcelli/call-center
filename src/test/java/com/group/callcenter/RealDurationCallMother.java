@@ -1,4 +1,4 @@
-package com.group.callcenter.integration;
+package com.group.callcenter;
 
 import java.util.List;
 import java.util.Random;

@@ -38,23 +38,20 @@ public class CallCenterPriorityAttentionTest {
 
 	@Test
 	public void only_first_link_is_called_if_can_handle_the_call() {
-		//GIVEN
 		givenAnAvailableFirstLink();
-		//WHEN
+
 		whenACallIsDispatched();
-		//THEN
+
 		thenFirstLinkHandleTheCall();
 	}
 
 	@Test
 	public void second_link_is_called_if_first_can_not_handle_the_call() {
-		//GIVEN
 		givenAnUnavailableFirstLink();
 		givenAnAvailableSecondLink();
 
-		//WHEN
 		whenACallIsDispatched();
-		//THEN
+
 		thenSecondLinkHandleTheCall();
 	}
 

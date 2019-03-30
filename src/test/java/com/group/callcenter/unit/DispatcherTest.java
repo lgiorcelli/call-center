@@ -15,7 +15,6 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
@@ -29,12 +28,9 @@ public class DispatcherTest {
 	private Dispatcher dispatcher;
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private CallCenter callCenter;
-	private Consumer<Call> onCallFinished;
 
 	@Before
 	public void setUp() {
-		onCallFinished = mock(Consumer.class);
-
 		FixedCapacityCallAnswerer defaultGroup = new FixedCapacityCallAnswerer("default", 1F);
 		List<CallAnswerer> answererGroup = Lists.newArrayList(defaultGroup);
 
@@ -47,36 +43,36 @@ public class DispatcherTest {
 	@Test
 	public void a_call_is_dispatched_when_has_answer_capacity() {
 		givenADispatcherWithRemainingCapacity();
-		//WHEN
+
 		whenACallArrives();
-		//THEN
+
 		thenCallIsDispatched();
 		thenOnCapacityExceedWasNotCalled();
 	}
 
 	@Test
 	public void handle_a_call_when_exceeds_answer_capacity() {
-		//GIVEN
 		givenADispatcherAtItsLimit();
-		//WHEN
+
 		whenACallArrives();
-		//THEN
+
 		thenOnCapacityExceededWasCalled();
 		thenCallWasNotDispatched();
-		Mockito.verifyZeroInteractions(onCallFinished);
 	}
 
 	@Test
 	public void increase_ongoing_calls_when_a_call_ends() {
-		//GIVEN
-		callCenter = mock(CallCenter.class);
+		givenACallCenterThatDoesNotEndCalls();
 		givenADispatcherWithRemainingCapacity();
-		//WHEN
+
 		dispatcher.dispatchCall(call);
-		//THEN
-		Assertions.assertThat(dispatcher.getCurrentOngoingCalls()).isEqualTo(1);
+
+		thenThereIsAOngoingCall();
 	}
 
+	private void givenACallCenterThatDoesNotEndCalls() {
+		callCenter = mock(CallCenter.class);
+	}
 
 	private void givenADispatcherAtItsLimit() {
 		dispatcher = aDispatcherWithCapacity(0);
@@ -107,9 +103,14 @@ public class DispatcherTest {
 		verifyZeroInteractions(onDispatcherCapacityExceeded);
 	}
 
+	private void thenThereIsAOngoingCall() {
+		Assertions.assertThat(dispatcher.getCurrentOngoingCalls()).isEqualTo(1);
+	}
+
 	private void thenCallIsDispatched() {
 		verify(call).link();
 	}
+
 
 	private Dispatcher aDispatcherWithCapacity(int capacity) {
 		return new Dispatcher(onDispatcherCapacityExceeded, capacity, callCenter, executorService, call ->{});
