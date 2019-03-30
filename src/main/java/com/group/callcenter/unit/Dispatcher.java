@@ -3,13 +3,16 @@ package com.group.callcenter.unit;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.priority.CallCenter;
 
+
 public class Dispatcher {
-	private final static Logger LOGGER = Logger.getLogger(Dispatcher.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
 	private Consumer<Call> onDispatcherCapacityExceeded;
 	private int currentOngoingCalls = 0;
 	private int maxOngoingCalls;
@@ -47,7 +50,7 @@ public class Dispatcher {
 		try {
 			CompletableFuture //
 					.runAsync(() -> {
-						LOGGER.info("Accepting call: " + call);
+						logger.info("Accepting call: " + call);
 						callCenter.accept(call);}, executorService)
 					.thenRun(this::decreaseOnGoingCalls);
 		} catch (Exception e) {
@@ -59,7 +62,7 @@ public class Dispatcher {
 		return currentOngoingCalls++;
 	}
 
-	public synchronized void decreaseOnGoingCalls() {
+	private synchronized void decreaseOnGoingCalls() {
 		currentOngoingCalls--;
 	}
 }

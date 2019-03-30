@@ -2,10 +2,14 @@ package com.group.callcenter.integration;
 
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.group.callcenter.domain.Call;
 
 public class MockedTimeDurationCall implements Call {
 
+	private static final Logger logger = LoggerFactory.getLogger(MockedTimeDurationCall.class);
 	private final int duration;
 	private String id;
 
@@ -15,9 +19,9 @@ public class MockedTimeDurationCall implements Call {
 	}
 
 	public void link() {
-		System.out.println("Linked call " + this);
+		logger.debug("Linked call {}", this);
 		sleep();
-		System.out.println(String.format("Call %s Finished after %d seconds", this, duration));
+		logger.info("Call {} finished after {} seconds", this, duration);
 	}
 
 	private void sleep() {

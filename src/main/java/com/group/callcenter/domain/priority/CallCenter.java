@@ -3,12 +3,15 @@ package com.group.callcenter.domain.priority;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
 
 public class CallCenter {
+	private static final Logger logger = LoggerFactory.getLogger(CallCenter.class);
 	private final List<CallAnswerer> answererGroups;
-	private Consumer<Call> onCallFinished = call -> {};
 	private Consumer<Call> onNoEmployeeAvailable = call -> {
 	};
 
@@ -30,7 +33,7 @@ public class CallCenter {
 	public void accept(Call call) {
 		CallAnswerer availableGroup = selectAvailableGroup();
 		if (availableGroup != null) {
-			System.out.println(String.format("Call %s Attended by %s", call, availableGroup.getName()));
+			logger.info("Call {} attended by {}", call, availableGroup.getName());
 			availableGroup.answer(call);
 		} else {
 			onNoEmployeeAvailable.accept(call);

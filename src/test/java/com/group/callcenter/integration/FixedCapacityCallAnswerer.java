@@ -2,14 +2,15 @@ package com.group.callcenter.integration;
 
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
 
 public class FixedCapacityCallAnswerer implements CallAnswerer {
-	private final static Logger LOGGER = Logger.getLogger(FixedCapacityCallAnswerer.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(FixedCapacityCallAnswerer.class);
 	private String name;
 	private float probability;
 	Random random = new Random();
@@ -33,7 +34,7 @@ public class FixedCapacityCallAnswerer implements CallAnswerer {
 
 	@Override
 	public void answer(Call call) {
-		System.out.println(String.format("Call %s answer by %s", call, name));
+		logger.info("Call {} answer by {}", call, name);
 		call.link();
 	}
 
