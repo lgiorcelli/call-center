@@ -1,4 +1,4 @@
-package com.group.callcenter.integration;
+package com.group.callcenter.infrastructure;
 
 import java.util.Random;
 import java.util.function.Consumer;

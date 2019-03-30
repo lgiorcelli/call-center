@@ -1,4 +1,4 @@
-package com.group.callcenter;
+package com.group.callcenter.infrastructure;
 
 import java.security.InvalidParameterException;
 import java.util.concurrent.CompletableFuture;
@@ -64,7 +64,4 @@ public class DefaultCallAnswerer implements CallAnswerer {
 		ongoingCalls--;
 	}
 
-	public int getOnGoingCalls() {
-		return ongoingCalls;
-	}
 }

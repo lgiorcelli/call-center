@@ -1,13 +1,10 @@
-package com.group.callcenter.domain.priority;
+package com.group.callcenter.domain;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.group.callcenter.domain.Call;
-import com.group.callcenter.domain.CallAnswerer;
 
 public class CallCenter {
 	private static final Logger logger = LoggerFactory.getLogger(CallCenter.class);

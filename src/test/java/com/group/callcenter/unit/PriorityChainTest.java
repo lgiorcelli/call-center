@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
-import com.group.callcenter.domain.priority.CallCenter;
+import com.group.callcenter.domain.CallCenter;
 
 public class PriorityChainTest {
 	private CallAnswerer secondGroup;

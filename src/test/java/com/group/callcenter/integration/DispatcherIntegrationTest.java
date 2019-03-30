@@ -4,22 +4,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.group.callcenter.domain.Call;
-import com.group.callcenter.unit.Dispatcher;
+import com.group.callcenter.domain.Dispatcher;
+import com.group.callcenter.factory.DispatcherFactory;
 
 public class DispatcherIntegrationTest {
 
-	private RealDurationCallMother callMother = new RealDurationCallMother();
+	private static final int TEST_TIMEOUT = 6;
 	private static final int PARALLEL_EXECUTIONS = 10;
-	private static final int CALLS_SIZE = 12;
+	private static final int CALLS_LIST_SIZE = 12;
 
+	private RealDurationCallMother callMother = new RealDurationCallMother();
 	private Dispatcher dispatcher;
 	private DispatcherFactory factory = new DispatcherFactory();
 
@@ -55,14 +54,14 @@ public class DispatcherIntegrationTest {
 
 	private void waitForCompletion() {
 		try {
-			TimeUnit.SECONDS.sleep(6);
+			TimeUnit.SECONDS.sleep(TEST_TIMEOUT);
 		} catch (InterruptedException e) {
 			throw new RuntimeException("Error esperando a que termine el test", e);
 		}
 	}
 
 	private void sendCallGroup(int groupId) {
-		List<Call> calls = callMother.aRandomDurationCallList(CALLS_SIZE, groupId);
+		List<Call> calls = callMother.aRandomDurationCallList(CALLS_LIST_SIZE, groupId);
 		for (Call call : calls) {
 			dispatcher.dispatchCall(call);
 		}

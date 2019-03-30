@@ -1,4 +1,4 @@
-package com.group.callcenter.unit;
+package com.group.callcenter.domain;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -6,10 +6,6 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.group.callcenter.domain.Call;
-import com.group.callcenter.domain.priority.CallCenter;
-
 
 public class Dispatcher {
 	private static final Logger logger = LoggerFactory.getLogger(Dispatcher.class);

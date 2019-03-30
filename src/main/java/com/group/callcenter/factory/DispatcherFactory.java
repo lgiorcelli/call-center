@@ -1,4 +1,4 @@
-package com.group.callcenter.integration;
+package com.group.callcenter.factory;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -11,8 +11,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.group.callcenter.domain.Call;
 import com.group.callcenter.domain.CallAnswerer;
-import com.group.callcenter.domain.priority.CallCenter;
-import com.group.callcenter.unit.Dispatcher;
+import com.group.callcenter.domain.CallCenter;
+import com.group.callcenter.domain.Dispatcher;
+import com.group.callcenter.infrastructure.FixedCapacityCallAnswerer;
 
 public class DispatcherFactory {
 	private static final Logger logger = LoggerFactory.getLogger(DispatcherFactory.class);
